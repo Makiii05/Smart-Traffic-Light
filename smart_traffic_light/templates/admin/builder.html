@@ -1,0 +1,240 @@
+{% extends 'components/layout.html' %}
+
+{% block body %}
+
+    <!-- header -->
+    <div class="flex flex-col items-center">
+        <h1 class="text-4xl font-bold">Smart Traffic Light</h1>
+        <h1 class="text-md">Road Builder</h1>
+    </div>
+
+    <div class="flex flex-row gap-4 w-full h-full">
+        <!-- form -->
+        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+            <form action="" class="flex flex-col gap-2 h-full">
+                <p class="text-lg font-semibold">Form</p>
+                <input name="road_name" type="text" placeholder="Road Name" class="input" id="road_name" required/>
+                <select name="intersection_type" class="select hidden" id="intersection_type" disabled>
+                    <option value="" disabled selected>Select Intersection Type</option>
+                    <option value="cross_intersection">Cross Intersection</option>
+                    <option value="t_intersection" disabled>T Intersection</option>
+                    <option value="no_intersection" disabled>No Intersection</option>
+                </select>
+                <select name="road_type" class="select hidden" id="road_type" disabled>
+                    <option value="" disabled selected>Select Road Type</option>
+                    <option value="one_way">One-Way Road</option>
+                    <option value="two_way">Two-Way Road</option>
+                    <option value="mix">Mixed Road</option>
+                </select>
+                <div class="flex gap-3">
+                    <select name="vertical_road_type" class="select hidden" id="vertical_road_type" disabled>
+                        <option value="" disabled selected>Select Vertical Road Type</option>
+                        <option value="one_way">One-Way Road</option>
+                        <option value="two_way">Two-Way Road</option>
+                    </select>
+                    <select name="horizontal_road_type" class="select hidden" id="horizontal_road_type" disabled>
+                        <option value="" disabled selected>Select Horizontal Road Type</option>
+                        <option value="one_way">One-Way Road</option>
+                        <option value="two_way">Two-Way Road</option>
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <select name="vertical_direction" class="select hidden" id="vertical_direction" disabled>
+                        <option value="" disabled selected>Select Vertical Direction</option>
+                        <option value="north_to_south">North to South</option>
+                        <option value="south_to_north">South to North</option>
+                    </select>
+                    <select name="horizontal_direction" class="select hidden"  id="horizontal_direction" disabled>
+                        <option value="" disabled selected>Select Horizontal Direction</option>
+                        <option value="east_to_west">East to West</option>
+                        <option value="west_to_east">West to East</option>
+                    </select>
+                </div>
+                <div class="border rounded p-2 flex flex-col gap-2 hidden" id="pedestrian_lane_options">
+                    <p class="text-md font-medium">Pedestrian Lane</p>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_north" value="north_lane" class="checkbox" />
+                        <label>North Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_south" value="south_lane" class="checkbox" />
+                        <label>South Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_east" value="east_lane" class="checkbox" />
+                        <label>East Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_west" value="west_lane" class="checkbox" />
+                        <label>West Lane</label>
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-end mt-auto">
+                    <a href="{% url 'index' %}" type="button" class="btn">Cancel</a>
+                    <button type="reset" class="btn">Reset</button>
+                    <button type="submit" class="btn" disabled>Save Build</button>
+                </div>
+            </form>
+        </div>
+        <!-- visual -->
+        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+            <p class="text-lg font-semibold">Visual Representation</p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            const saveButton = form.querySelector('button[type="submit"]');
+            const roadName = document.getElementById("road_name");
+            const intersectionType = document.getElementById("intersection_type");
+            const roadType = document.getElementById("road_type");
+            const verticalRoadType = document.getElementById("vertical_road_type");
+            const horizontalRoadType = document.getElementById("horizontal_road_type");
+            const verticalDirection = document.getElementById("vertical_direction");
+            const horizontalDirection = document.getElementById("horizontal_direction");
+            const pedestrianLaneOptions = document.getElementById("pedestrian_lane_options");
+            const pedestrianCheckboxes = Array.from(pedestrianLaneOptions.querySelectorAll('input[type="checkbox"]'));
+
+            const selectFields = [
+                intersectionType,
+                roadType,
+                verticalRoadType,
+                horizontalRoadType,
+                verticalDirection,
+                horizontalDirection,
+            ];
+
+            function resetSelect(select) {
+                select.value = "";
+                select.selectedIndex = 0;
+            }
+
+            function setSelectVisible(select, visible) {
+                select.classList.toggle("hidden", !visible);
+                select.disabled = !visible;
+                select.required = visible;
+
+                if (!visible) {
+                    resetSelect(select);
+                }
+            }
+
+            function setPedestrianVisible(visible) {
+                pedestrianLaneOptions.classList.toggle("hidden", !visible);
+
+                pedestrianCheckboxes.forEach((checkbox) => {
+                    checkbox.disabled = !visible;
+
+                    if (!visible) {
+                        checkbox.checked = false;
+                    }
+                });
+            }
+
+            function hideAllConditionalFields() {
+                selectFields.forEach((select) => setSelectVisible(select, false));
+                setPedestrianVisible(false);
+            }
+
+            function updateForm(triggeredField = "") {
+                if (!roadName.value.trim()) {
+                    hideAllConditionalFields();
+                    saveButton.disabled = true;
+                    return;
+                }
+
+                setSelectVisible(intersectionType, true);
+
+                if (intersectionType.value !== "cross_intersection") {
+                    setSelectVisible(roadType, false);
+                    setSelectVisible(verticalRoadType, false);
+                    setSelectVisible(horizontalRoadType, false);
+                    setSelectVisible(verticalDirection, false);
+                    setSelectVisible(horizontalDirection, false);
+                    setPedestrianVisible(false);
+                    saveButton.disabled = !form.checkValidity();
+                    return;
+                }
+
+                setSelectVisible(roadType, true);
+
+                const roadTypeValue = roadType.value;
+
+                if (roadTypeValue === "two_way") {
+                    setSelectVisible(verticalRoadType, false);
+                    setSelectVisible(horizontalRoadType, false);
+                    setSelectVisible(verticalDirection, false);
+                    setSelectVisible(horizontalDirection, false);
+                    setPedestrianVisible(true);
+                    saveButton.disabled = !form.checkValidity();
+                    return;
+                }
+
+                if (roadTypeValue === "one_way") {
+                    setSelectVisible(verticalRoadType, false);
+                    setSelectVisible(horizontalRoadType, false);
+                    setSelectVisible(verticalDirection, true);
+                    setSelectVisible(horizontalDirection, true);
+                    setPedestrianVisible(verticalDirection.value !== "" && horizontalDirection.value !== "");
+                    saveButton.disabled = !form.checkValidity();
+                    return;
+                }
+
+                if (roadTypeValue === "mix") {
+                    setSelectVisible(verticalRoadType, true);
+                    setSelectVisible(horizontalRoadType, true);
+
+                    if (triggeredField === "vertical_road_type" && verticalRoadType.value === "one_way") {
+                        horizontalRoadType.value = "two_way";
+                    } else if (triggeredField === "horizontal_road_type" && horizontalRoadType.value === "one_way") {
+                        verticalRoadType.value = "two_way";
+                    } else if (verticalRoadType.value === "one_way" && horizontalRoadType.value !== "two_way") {
+                        horizontalRoadType.value = "two_way";
+                    } else if (horizontalRoadType.value === "one_way" && verticalRoadType.value !== "two_way") {
+                        verticalRoadType.value = "two_way";
+                    }
+
+                    const verticalOneWay = verticalRoadType.value === "one_way";
+                    const horizontalOneWay = horizontalRoadType.value === "one_way";
+
+                    setSelectVisible(verticalDirection, verticalOneWay);
+                    setSelectVisible(horizontalDirection, horizontalOneWay);
+
+                    const pedestrianVisible = (verticalOneWay && verticalDirection.value !== "") || (horizontalOneWay && horizontalDirection.value !== "");
+                    setPedestrianVisible(pedestrianVisible);
+                    saveButton.disabled = !form.checkValidity();
+                    return;
+                }
+
+                setSelectVisible(verticalRoadType, false);
+                setSelectVisible(horizontalRoadType, false);
+                setSelectVisible(verticalDirection, false);
+                setSelectVisible(horizontalDirection, false);
+                setPedestrianVisible(false);
+                saveButton.disabled = !form.checkValidity();
+            }
+
+            roadName.addEventListener("input", () => updateForm("road_name"));
+            intersectionType.addEventListener("change", () => updateForm("intersection_type"));
+            roadType.addEventListener("change", () => updateForm("road_type"));
+            verticalRoadType.addEventListener("change", () => updateForm("vertical_road_type"));
+            horizontalRoadType.addEventListener("change", () => updateForm("horizontal_road_type"));
+            verticalDirection.addEventListener("change", () => updateForm("vertical_direction"));
+            horizontalDirection.addEventListener("change", () => updateForm("horizontal_direction"));
+
+            form.addEventListener("reset", () => {
+                window.setTimeout(() => {
+                    hideAllConditionalFields();
+                    saveButton.disabled = true;
+                }, 0);
+            });
+
+            hideAllConditionalFields();
+            saveButton.disabled = true;
+            updateForm();
+        });
+
+    </script>
+{% endblock body %}
