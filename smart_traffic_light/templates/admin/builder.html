@@ -1,4 +1,5 @@
 {% extends 'components/layout.html' %}
+{% load static %}
 
 {% block body %}
 
@@ -78,163 +79,11 @@
         </div>
         <!-- visual -->
         <div class="w-full rounded shadow p-4 bg-base-100 h-full">
-            <p class="text-lg font-semibold">Visual Representation</p>
+            <canvas class="w-full h-full" id="myCanvas"></canvas>
         </div>
     </div>
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.querySelector("form");
-            const saveButton = form.querySelector('button[type="submit"]');
-            const roadName = document.getElementById("road_name");
-            const intersectionType = document.getElementById("intersection_type");
-            const roadType = document.getElementById("road_type");
-            const verticalRoadType = document.getElementById("vertical_road_type");
-            const horizontalRoadType = document.getElementById("horizontal_road_type");
-            const verticalDirection = document.getElementById("vertical_direction");
-            const horizontalDirection = document.getElementById("horizontal_direction");
-            const pedestrianLaneOptions = document.getElementById("pedestrian_lane_options");
-            const pedestrianCheckboxes = Array.from(pedestrianLaneOptions.querySelectorAll('input[type="checkbox"]'));
-
-            const selectFields = [
-                intersectionType,
-                roadType,
-                verticalRoadType,
-                horizontalRoadType,
-                verticalDirection,
-                horizontalDirection,
-            ];
-
-            function resetSelect(select) {
-                select.value = "";
-                select.selectedIndex = 0;
-            }
-
-            function setSelectVisible(select, visible) {
-                select.classList.toggle("hidden", !visible);
-                select.disabled = !visible;
-                select.required = visible;
-
-                if (!visible) {
-                    resetSelect(select);
-                }
-            }
-
-            function setPedestrianVisible(visible) {
-                pedestrianLaneOptions.classList.toggle("hidden", !visible);
-
-                pedestrianCheckboxes.forEach((checkbox) => {
-                    checkbox.disabled = !visible;
-
-                    if (!visible) {
-                        checkbox.checked = false;
-                    }
-                });
-            }
-
-            function hideAllConditionalFields() {
-                selectFields.forEach((select) => setSelectVisible(select, false));
-                setPedestrianVisible(false);
-            }
-
-            function updateForm(triggeredField = "") {
-                if (!roadName.value.trim()) {
-                    hideAllConditionalFields();
-                    saveButton.disabled = true;
-                    return;
-                }
-
-                setSelectVisible(intersectionType, true);
-
-                if (intersectionType.value !== "cross_intersection") {
-                    setSelectVisible(roadType, false);
-                    setSelectVisible(verticalRoadType, false);
-                    setSelectVisible(horizontalRoadType, false);
-                    setSelectVisible(verticalDirection, false);
-                    setSelectVisible(horizontalDirection, false);
-                    setPedestrianVisible(false);
-                    saveButton.disabled = !form.checkValidity();
-                    return;
-                }
-
-                setSelectVisible(roadType, true);
-
-                const roadTypeValue = roadType.value;
-
-                if (roadTypeValue === "two_way") {
-                    setSelectVisible(verticalRoadType, false);
-                    setSelectVisible(horizontalRoadType, false);
-                    setSelectVisible(verticalDirection, false);
-                    setSelectVisible(horizontalDirection, false);
-                    setPedestrianVisible(true);
-                    saveButton.disabled = !form.checkValidity();
-                    return;
-                }
-
-                if (roadTypeValue === "one_way") {
-                    setSelectVisible(verticalRoadType, false);
-                    setSelectVisible(horizontalRoadType, false);
-                    setSelectVisible(verticalDirection, true);
-                    setSelectVisible(horizontalDirection, true);
-                    setPedestrianVisible(verticalDirection.value !== "" && horizontalDirection.value !== "");
-                    saveButton.disabled = !form.checkValidity();
-                    return;
-                }
-
-                if (roadTypeValue === "mix") {
-                    setSelectVisible(verticalRoadType, true);
-                    setSelectVisible(horizontalRoadType, true);
-
-                    if (triggeredField === "vertical_road_type" && verticalRoadType.value === "one_way") {
-                        horizontalRoadType.value = "two_way";
-                    } else if (triggeredField === "horizontal_road_type" && horizontalRoadType.value === "one_way") {
-                        verticalRoadType.value = "two_way";
-                    } else if (verticalRoadType.value === "one_way" && horizontalRoadType.value !== "two_way") {
-                        horizontalRoadType.value = "two_way";
-                    } else if (horizontalRoadType.value === "one_way" && verticalRoadType.value !== "two_way") {
-                        verticalRoadType.value = "two_way";
-                    }
-
-                    const verticalOneWay = verticalRoadType.value === "one_way";
-                    const horizontalOneWay = horizontalRoadType.value === "one_way";
-
-                    setSelectVisible(verticalDirection, verticalOneWay);
-                    setSelectVisible(horizontalDirection, horizontalOneWay);
-
-                    const pedestrianVisible = (verticalOneWay && verticalDirection.value !== "") || (horizontalOneWay && horizontalDirection.value !== "");
-                    setPedestrianVisible(pedestrianVisible);
-                    saveButton.disabled = !form.checkValidity();
-                    return;
-                }
-
-                setSelectVisible(verticalRoadType, false);
-                setSelectVisible(horizontalRoadType, false);
-                setSelectVisible(verticalDirection, false);
-                setSelectVisible(horizontalDirection, false);
-                setPedestrianVisible(false);
-                saveButton.disabled = !form.checkValidity();
-            }
-
-            roadName.addEventListener("input", () => updateForm("road_name"));
-            intersectionType.addEventListener("change", () => updateForm("intersection_type"));
-            roadType.addEventListener("change", () => updateForm("road_type"));
-            verticalRoadType.addEventListener("change", () => updateForm("vertical_road_type"));
-            horizontalRoadType.addEventListener("change", () => updateForm("horizontal_road_type"));
-            verticalDirection.addEventListener("change", () => updateForm("vertical_direction"));
-            horizontalDirection.addEventListener("change", () => updateForm("horizontal_direction"));
-
-            form.addEventListener("reset", () => {
-                window.setTimeout(() => {
-                    hideAllConditionalFields();
-                    saveButton.disabled = true;
-                }, 0);
-            });
-
-            hideAllConditionalFields();
-            saveButton.disabled = true;
-            updateForm();
-        });
-
-    </script>
 {% endblock body %}
+
+{% block scripts %}
+    <script src="{% static 'smart_traffic_light/js/builder.js' %}"></script>
+{% endblock scripts %}
