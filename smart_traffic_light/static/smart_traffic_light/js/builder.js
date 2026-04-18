@@ -108,17 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const arrowLength = Math.min(100, availableLenX, availableLenY);
         const arrowWidth = 20;
 
-        const vLaneLeftX = cx - ROAD_HALF + arrowWidth * 0.5;
-        const vLaneRightX = cx + ROAD_HALF - arrowWidth * 1.5;
+        const vLaneLeftX = cx - ROAD_HALF - arrowWidth * 1.5;
+        const vLaneRightX = cx + ROAD_HALF + arrowWidth * 0.5;
 
-        const hLaneTopY = cy - ROAD_HALF + arrowWidth * 0.5;
-        const hLaneBottomY = cy + ROAD_HALF - arrowWidth * 1.5;
+        const hLaneTopY = cy - ROAD_HALF - arrowWidth * 1.5;
+        const hLaneBottomY = cy + ROAD_HALF + arrowWidth * 0.5;
 
-        const vNorthY = cy - ROAD_HALF - crosswalkOffsetY - arrowLength;
-        const vSouthY = cy + ROAD_HALF + crosswalkOffsetY;
+        const vNorthY = cy - ROAD_HALF - crosswalkOffsetY - arrowLength * 1.2;
+        const vSouthY = cy + ROAD_HALF + crosswalkOffsetY * 1.2;
 
-        const hWestX = cx - ROAD_HALF - crosswalkOffsetX - arrowLength;
-        const hEastX = cx + ROAD_HALF + crosswalkOffsetX;
+        const hWestX = cx - ROAD_HALF - crosswalkOffsetX - arrowLength * 1.2;
+        const hEastX = cx + ROAD_HALF + crosswalkOffsetX * 1.2;
 
         return {
             cx,
