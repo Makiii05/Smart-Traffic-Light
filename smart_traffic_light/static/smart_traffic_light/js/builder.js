@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
         horizontalDirection,
     ];
 
+    const editMode = form.dataset.editMode === "true";
+
     function resetSelect(select) {
         select.value = "";
         select.selectedIndex = 0;
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         select.disabled = !visible;
         select.required = visible;
 
-        if (!visible) {
+        if (!visible && !editMode) {
             resetSelect(select);
         }
     }
@@ -83,6 +85,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         pedestrianCheckboxes.forEach((checkbox) => {
             checkbox.disabled = !visible;
+
+            if (editMode && checkbox.dataset.ped === "True") {
+                checkbox.checked = true;
+            }
 
             if (!visible) {
                 checkbox.checked = false;
@@ -375,6 +381,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setSelectVisible(intersectionType, true);
 
+        if (editMode && !intersectionType.value) {
+            setSelectVisible(intersectionType, false);
+            updateVisual();
+            saveButton.disabled = !form.checkValidity();
+            return;
+        }
+
         if (intersectionType.value !== "cross_intersection") {
             setSelectVisible(roadType, false);
             setSelectVisible(verticalRoadType, false);
@@ -388,6 +401,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         setSelectVisible(roadType, true);
+
+        if (editMode && !roadType.value) {
+            setSelectVisible(roadType, false);
+            setSelectVisible(verticalRoadType, false);
+            setSelectVisible(horizontalRoadType, false);
+            setSelectVisible(verticalDirection, false);
+            setSelectVisible(horizontalDirection, false);
+            setPedestrianVisible(false);
+            updateVisual();
+            saveButton.disabled = !form.checkValidity();
+            return;
+        }
 
         const roadTypeValue = roadType.value;
 
@@ -407,6 +432,13 @@ document.addEventListener("DOMContentLoaded", () => {
             setSelectVisible(horizontalRoadType, false);
             setSelectVisible(verticalDirection, true);
             setSelectVisible(horizontalDirection, true);
+
+            if (editMode && !verticalDirection.value) {
+                setSelectVisible(verticalDirection, false);
+            }
+            if (editMode && !horizontalDirection.value) {
+                setSelectVisible(horizontalDirection, false);
+            }
             setPedestrianVisible(verticalDirection.value !== "" && horizontalDirection.value !== "");
             updateVisual();
             saveButton.disabled = !form.checkValidity();
@@ -416,6 +448,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (roadTypeValue === "mix") {
             setSelectVisible(verticalRoadType, true);
             setSelectVisible(horizontalRoadType, true);
+
+            if (editMode && !verticalRoadType.value) {
+                setSelectVisible(verticalRoadType, false);
+            }
+            if (editMode && !horizontalRoadType.value) {
+                setSelectVisible(horizontalRoadType, false);
+            }
 
             if (triggeredField === "vertical_road_type" && verticalRoadType.value === "one_way") {
                 horizontalRoadType.value = "two_way";
@@ -475,5 +514,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hideAllConditionalFields();
     saveButton.disabled = true;
-    updateForm();
+    updateForm(editMode ? "init" : "");
 });

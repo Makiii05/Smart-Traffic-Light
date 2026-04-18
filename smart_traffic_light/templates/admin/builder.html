@@ -12,7 +12,8 @@
     <div class="flex flex-row gap-4 w-full h-full">
         <!-- form -->
         <div class="w-full rounded shadow p-4 bg-base-100 h-full">
-            <form action="" class="flex flex-col gap-2 h-full">
+            <form action="{% url 'create_road' %}" method="POST" class="flex flex-col gap-2 h-full">
+                {% csrf_token %}
                 <p class="text-lg font-semibold">Form</p>
                 <input name="road_name" type="text" placeholder="Road Name" class="input" id="road_name" required/>
                 <select name="intersection_type" class="select hidden" id="intersection_type" disabled>

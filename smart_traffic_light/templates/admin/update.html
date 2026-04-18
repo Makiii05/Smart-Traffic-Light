@@ -1,0 +1,90 @@
+{% extends 'components/layout.html' %}
+{% load static %}
+
+{% block body %}
+
+    <!-- header -->
+    <div class="flex flex-col items-center">
+        <h1 class="text-4xl font-bold">Smart Traffic Light</h1>
+        <h1 class="text-md">Update Road</h1>
+    </div>
+
+    <div class="flex flex-row gap-4 w-full h-full">
+        <!-- form -->
+        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+            <form action="{% url 'update_road' intersection.id %}" method="POST" class="flex flex-col gap-2 h-full" data-edit-mode="true">
+                {% csrf_token %}
+                <p class="text-lg font-semibold">Form</p>
+                <input name="road_name" type="text" placeholder="Road Name" class="input" id="road_name" required value="{{ intersection.name }}" />
+                <select name="intersection_type" class="select hidden" id="intersection_type" disabled>
+                    <option value="" disabled>Select Intersection Type</option>
+                    <option value="cross_intersection" {% if intersection.intersection_type == "cross_intersection" %}selected{% endif %}>Cross Intersection</option>
+                    <option value="t_intersection" disabled>T Intersection</option>
+                    <option value="no_intersection" disabled>No Intersection</option>
+                </select>
+                <select name="road_type" class="select hidden" id="road_type" disabled>
+                    <option value="" disabled>Select Road Type</option>
+                    <option value="one_way" {% if initial_form.road_type == "one_way" %}selected{% endif %}>One-Way Road</option>
+                    <option value="two_way" {% if initial_form.road_type == "two_way" %}selected{% endif %}>Two-Way Road</option>
+                    <option value="mix" {% if initial_form.road_type == "mix" %}selected{% endif %}>Mixed Road</option>
+                </select>
+                <div class="flex gap-3">
+                    <select name="vertical_road_type" class="select hidden" id="vertical_road_type" disabled>
+                        <option value="" disabled>Select Vertical Road Type</option>
+                        <option value="one_way" {% if initial_form.vertical_road_mode == "one_way" %}selected{% endif %}>One-Way Road</option>
+                        <option value="two_way" {% if initial_form.vertical_road_mode == "two_way" %}selected{% endif %}>Two-Way Road</option>
+                    </select>
+                    <select name="horizontal_road_type" class="select hidden" id="horizontal_road_type" disabled>
+                        <option value="" disabled>Select Horizontal Road Type</option>
+                        <option value="one_way" {% if initial_form.horizontal_road_mode == "one_way" %}selected{% endif %}>One-Way Road</option>
+                        <option value="two_way" {% if initial_form.horizontal_road_mode == "two_way" %}selected{% endif %}>Two-Way Road</option>
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <select name="vertical_direction" class="select hidden" id="vertical_direction" disabled>
+                        <option value="" disabled>Select Vertical Direction</option>
+                        <option value="north_to_south" {% if initial_form.vertical_direction == "north_to_south" %}selected{% endif %}>North to South</option>
+                        <option value="south_to_north" {% if initial_form.vertical_direction == "south_to_north" %}selected{% endif %}>South to North</option>
+                    </select>
+                    <select name="horizontal_direction" class="select hidden"  id="horizontal_direction" disabled>
+                        <option value="" disabled>Select Horizontal Direction</option>
+                        <option value="east_to_west" {% if initial_form.horizontal_direction == "east_to_west" %}selected{% endif %}>East to West</option>
+                        <option value="west_to_east" {% if initial_form.horizontal_direction == "west_to_east" %}selected{% endif %}>West to East</option>
+                    </select>
+                </div>
+                <div class="border rounded p-2 flex flex-col gap-2 hidden" id="pedestrian_lane_options">
+                    <p class="text-md font-medium">Pedestrian Lane</p>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_north" value="north_lane" class="checkbox" data-ped="{{ pedestrian_config.north }}"/>
+                        <label>North Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_south" value="south_lane" class="checkbox" data-ped="{{ pedestrian_config.south }}"/>
+                        <label>South Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_east" value="east_lane" class="checkbox" data-ped="{{ pedestrian_config.east }}"/>
+                        <label>East Lane</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="pedestrian_lane_west" value="west_lane" class="checkbox" data-ped="{{ pedestrian_config.west }}"/>
+                        <label>West Lane</label>
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-end mt-auto">
+                    <a href="{% url 'index' %}" type="button" class="btn">Cancel</a>
+                    <button type="reset" class="btn">Reset</button>
+                    <button type="submit" class="btn">Update Road</button>
+                </div>
+            </form>
+        </div>
+        <!-- visual -->
+        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+            <canvas class="w-full h-full" id="myCanvas"></canvas>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block scripts %}
+    <script src="{% static 'smart_traffic_light/js/builder.js' %}"></script>
+{% endblock scripts %}

@@ -30,28 +30,9 @@ class HorizontalDirectionName(models.TextChoices):
     WEST_TO_EAST = "west_to_east", "West to East"
     AUTO = "auto", "Auto"
 
-
-class Admin(models.Model):
-    username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(max_length=150, unique=True)
-    password = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "admins"
-
-    def __str__(self):
-        return self.username
-
-
 class Intersection(models.Model):
-    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name="intersections")
     name = models.CharField(max_length=150)
-    intersection_type = models.CharField(
-        max_length=30,
-        choices=IntersectionTypeName.choices
-    )
+    intersection_type = models.CharField(max_length=30,choices=IntersectionTypeName.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -63,37 +44,12 @@ class Intersection(models.Model):
 
 
 class RoadType(models.Model):
-    intersection = models.OneToOneField(
-        Intersection,
-        on_delete=models.CASCADE,
-        related_name="road_type_config"
-    )
-    road_type = models.CharField(
-        max_length=20,
-        choices=RoadTypeName.choices
-    )
-    vertical_road_mode = models.CharField(
-        max_length=20,
-        choices=RoadModeName.choices,
-        null=True,
-        blank=True
-    )
-    horizontal_road_mode = models.CharField(
-        max_length=20,
-        choices=RoadModeName.choices,
-        null=True,
-        blank=True
-    )
-    vertical_direction = models.CharField(
-        max_length=20,
-        choices=VerticalDirectionName.choices,
-        default=VerticalDirectionName.AUTO
-    )
-    horizontal_direction = models.CharField(
-        max_length=20,
-        choices=HorizontalDirectionName.choices,
-        default=HorizontalDirectionName.AUTO
-    )
+    intersection = models.OneToOneField(Intersection,on_delete=models.CASCADE,related_name="road_type_config")
+    road_type = models.CharField(max_length=20,choices=RoadTypeName.choices)
+    vertical_road_mode = models.CharField(max_length=20,choices=RoadModeName.choices,null=True,blank=True)
+    horizontal_road_mode = models.CharField(max_length=20,choices=RoadModeName.choices,null=True,blank=True)
+    vertical_direction = models.CharField(max_length=20,choices=VerticalDirectionName.choices,default=VerticalDirectionName.AUTO, null=True, blank=True)
+    horizontal_direction = models.CharField(max_length=20,choices=HorizontalDirectionName.choices,default=HorizontalDirectionName.AUTO, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -105,11 +61,7 @@ class RoadType(models.Model):
 
 
 class Pedestrian(models.Model):
-    intersection = models.OneToOneField(
-        Intersection,
-        on_delete=models.CASCADE,
-        related_name="pedestrian_config"
-    )
+    intersection = models.OneToOneField(Intersection,on_delete=models.CASCADE,related_name="pedestrian_config")
     north = models.BooleanField(default=False)
     south = models.BooleanField(default=False)
     east = models.BooleanField(default=False)
@@ -122,30 +74,3 @@ class Pedestrian(models.Model):
 
     def __str__(self):
         return f"{self.intersection.name} Pedestrian Setup"
-
-
-class SystemLog(models.Model):
-    admin = models.ForeignKey(
-        Admin,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="system_logs"
-    )
-    intersection = models.ForeignKey(
-        Intersection,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="system_logs"
-    )
-    action = models.CharField(max_length=50)
-    description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "system_logs"
-
-    def __str__(self):
-        return f"{self.action} at {self.created_at}"
-
