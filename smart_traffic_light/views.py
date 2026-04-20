@@ -16,9 +16,11 @@ def builder(request):
     return render(request, "admin/builder.html")
 
 def controller(request, road_id):
+    intersection = Intersection.objects.select_related("road_type_config", "pedestrian_config").get(id=road_id)
+    
     return render(request, "admin/controller.html", {
-        "road_id": road_id
-        })
+        "intersection": intersection
+    })
 
 
 
