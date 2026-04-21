@@ -1,11 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Traffic Light</title>
-</head>
-<body>
-    {{ road_id }}
-</body>
-</html>
+{% extends 'components/layout.html' %}
+{% load static %}
+
+{% block body %}
+
+    <!-- header -->
+    <div class="flex flex-col items-center">
+        <h1 class="text-4xl font-bold">Smart Traffic Light</h1>
+        <h1 class="text-md">Controller</h1>
+    </div>
+
+    <div class="w-full rounded shadow p-3 bg-base-100 text-xs sm:text-sm">
+        <div class="flex flex-wrap gap-x-6 gap-y-2">
+            <p><span class="font-semibold">Name:</span> {{ controller_data.name }}</p>
+            <p><span class="font-semibold">Type:</span> {{ controller_data.intersection_type_display }}</p>
+            <p><span class="font-semibold">Road:</span> {{ controller_data.road_type_display|default:controller_data.road_type }}</p>
+            <p><span class="font-semibold">Vertical:</span> {{ controller_data.vertical_direction|default:"n/a" }}</p>
+            <p><span class="font-semibold">Horizontal:</span> {{ controller_data.horizontal_direction|default:"n/a" }}</p>
+            <p><span class="font-semibold">Pedestrian:</span>
+                {% if controller_data.pedestrian.north %}north {% endif %}
+                {% if controller_data.pedestrian.south %}south {% endif %}
+                {% if controller_data.pedestrian.east %}east {% endif %}
+                {% if controller_data.pedestrian.west %}west{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="flex flex-row gap-4 w-full h-full">
+        <!-- form -->
+        <form action="" method="POST" class="flex flex-col gap-2 h-full">
+            {% csrf_token %}
+            <div class="w-full h-full flex flex-col gap-4">
+                <div class="rounded shadow p-4 bg-base-100">
+                    <div class="flex gap-4">
+                        <div>
+                            <label for="min_timer" class="form-label">Minimum Timer (s)</label>
+                            <input name="min_timer" type="number" placeholder="Minimum Timer" class="input" id="min_timer" min="0" required/>
+                        </div>
+                        <div>
+                            <label for="max_timer" class="form-label">Maximum Timer (s)</label>
+                            <input name="max_timer" type="number" placeholder="Maximum Timer" class="input" id="max_timer" min="0" required/>
+                        </div>
+                        <div>
+                            <label for="timer_per_vehicle" class="form-label">Time per Vehicle (s)</label>
+                            <input name="timer_per_vehicle" type="number" placeholder="Time per Vehicle" class="input" id="timer_per_vehicle" min="0" required/>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded shadow p-4 bg-base-100 h-full flex flex-col gap-4">
+                    <!-- select camera -->
+                    <!-- set ROI -->
+                    <!-- traffic lights visual -->
+                    <div class="flex gap-2 justify-end mt-auto">
+                        <a href="{% url 'index' %}" type="button" class="btn">Cancel</a>
+                        <button type="submit" class="btn btn-success" >Start</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- visual -->
+        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+            <canvas class="w-full h-full" id="myCanvas"></canvas>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block scripts %}
+    {{ controller_data|json_script:"controller-data" }}
+    <script src="{% static 'smart_traffic_light/js/traffic_visual.js' %}"></script>
+    <script src="{% static 'smart_traffic_light/js/controller.js' %}"></script>
+{% endblock scripts %}

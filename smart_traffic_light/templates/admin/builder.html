@@ -74,7 +74,7 @@
                 <div class="flex gap-2 justify-end mt-auto">
                     <a href="{% url 'index' %}" type="button" class="btn">Cancel</a>
                     <button type="reset" class="btn">Reset</button>
-                    <button type="submit" class="btn" disabled>Save Build</button>
+                    <button type="submit" class="btn btn-success" disabled>Save Build</button>
                 </div>
             </form>
         </div>
@@ -86,5 +86,6 @@
 {% endblock body %}
 
 {% block scripts %}
+    <script src="{% static 'smart_traffic_light/js/traffic_visual.js' %}"></script>
     <script src="{% static 'smart_traffic_light/js/builder.js' %}"></script>
 {% endblock scripts %}

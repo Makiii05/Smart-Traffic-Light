@@ -17,9 +17,31 @@ def builder(request):
 
 def controller(request, road_id):
     intersection = Intersection.objects.select_related("road_type_config", "pedestrian_config").get(id=road_id)
+    road_type_config = getattr(intersection, "road_type_config", None)
+    pedestrian_config = getattr(intersection, "pedestrian_config", None)
+
+    controller_data = {
+        "id": intersection.id,
+        "name": intersection.name,
+        "intersection_type": intersection.intersection_type,
+        "intersection_type_display": intersection.get_intersection_type_display(),
+        "road_type": road_type_config.road_type if road_type_config else "",
+        "road_type_display": road_type_config.get_road_type_display() if road_type_config else "",
+        "vertical_road_mode": road_type_config.vertical_road_mode if road_type_config else "",
+        "horizontal_road_mode": road_type_config.horizontal_road_mode if road_type_config else "",
+        "vertical_direction": road_type_config.vertical_direction if road_type_config else "",
+        "horizontal_direction": road_type_config.horizontal_direction if road_type_config else "",
+        "pedestrian": {
+            "north": bool(pedestrian_config and pedestrian_config.north),
+            "south": bool(pedestrian_config and pedestrian_config.south),
+            "east": bool(pedestrian_config and pedestrian_config.east),
+            "west": bool(pedestrian_config and pedestrian_config.west),
+        },
+    }
     
     return render(request, "admin/controller.html", {
-        "intersection": intersection
+        "intersection": intersection,
+        "controller_data": controller_data,
     })
 
 
