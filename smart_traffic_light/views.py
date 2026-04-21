@@ -1,7 +1,9 @@
+import json
+
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from .models import Intersection, RoadType, Pedestrian
+from .models import Intersection, RoadType, Pedestrian, ControllerTimes
 
 # Create your views here.
 
@@ -17,6 +19,14 @@ def builder(request):
 
 def controller(request, road_id):
     intersection = Intersection.objects.select_related("road_type_config", "pedestrian_config").get(id=road_id)
+    controller_times, _ = ControllerTimes.objects.get_or_create(
+        intersection=intersection,
+        defaults={
+            "min_time": 0,
+            "max_time": 0,
+            "time_per_vehicle": 0.0,
+        },
+    )
     road_type_config = getattr(intersection, "road_type_config", None)
     pedestrian_config = getattr(intersection, "pedestrian_config", None)
 
@@ -37,13 +47,18 @@ def controller(request, road_id):
             "east": bool(pedestrian_config and pedestrian_config.east),
             "west": bool(pedestrian_config and pedestrian_config.west),
         },
+        "controller_times": {
+            "min_time": controller_times.min_time,
+            "max_time": controller_times.max_time,
+            "time_per_vehicle": controller_times.time_per_vehicle,
+        },
     }
     
     return render(request, "admin/controller.html", {
         "intersection": intersection,
         "controller_data": controller_data,
+        "controller_times_api_url": reverse("update_controller_times_api", args=[intersection.id]),
     })
-
 
 
 
@@ -82,6 +97,12 @@ def create_road(request):
             south=True if south else False,
             east=True if east else False,
             west=True if west else False,
+        )
+        ControllerTimes.objects.create(
+            intersection=intersection,
+            min_time=0,
+            max_time=0,
+            time_per_vehicle=0.0
         )
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -155,3 +176,50 @@ def update_road(request, road_id):
             "ped_west": "true" if pedestrian_config and pedestrian_config.west else "false",
         },
     })
+
+
+def update_controller_times_api(request, road_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        intersection = Intersection.objects.get(id=road_id)
+    except Intersection.DoesNotExist:
+        return JsonResponse({"error": "Intersection not found"}, status=404)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+
+    try:
+        min_time = int(payload.get("min_time", 0))
+        max_time = int(payload.get("max_time", 0))
+        time_per_vehicle = float(payload.get("time_per_vehicle", 0))
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Timer values must be numeric"}, status=400)
+
+    controller_times, _ = ControllerTimes.objects.get_or_create(
+        intersection=intersection,
+        defaults={
+            "min_time": 0,
+            "max_time": 0,
+            "time_per_vehicle": 0.0,
+        },
+    )
+
+    controller_times.min_time = min_time
+    controller_times.max_time = max_time
+    controller_times.time_per_vehicle = time_per_vehicle
+    controller_times.save()
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "controller_times": {
+                "min_time": controller_times.min_time,
+                "max_time": controller_times.max_time,
+                "time_per_vehicle": controller_times.time_per_vehicle,
+            },
+        }
+    )

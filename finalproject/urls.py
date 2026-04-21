@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include("smart_traffic_light.urls")),
+    path('smart_traffic_light/', include("smart_traffic_light.urls")),
 ]

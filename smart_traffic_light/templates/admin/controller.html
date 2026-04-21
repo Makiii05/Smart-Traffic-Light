@@ -27,22 +27,22 @@
 
     <div class="flex flex-row gap-4 w-full h-full">
         <!-- form -->
-        <form action="" method="POST" class="flex flex-col gap-2 h-full">
+        <form action="" method="POST" class="flex flex-col gap-2 h-full" data-controller-times-api-url="{{ controller_times_api_url }}">
             {% csrf_token %}
             <div class="w-full h-full flex flex-col gap-4">
                 <div class="rounded shadow p-4 bg-base-100">
                     <div class="flex gap-4">
                         <div>
                             <label for="min_timer" class="form-label">Minimum Timer (s)</label>
-                            <input name="min_timer" type="number" placeholder="Minimum Timer" class="input" id="min_timer" min="0" required/>
+                            <input name="min_timer" type="number" placeholder="Minimum Timer" class="input" id="min_timer" min="0" value="{{ controller_data.controller_times.min_time }}" required/>
                         </div>
                         <div>
                             <label for="max_timer" class="form-label">Maximum Timer (s)</label>
-                            <input name="max_timer" type="number" placeholder="Maximum Timer" class="input" id="max_timer" min="0" required/>
+                            <input name="max_timer" type="number" placeholder="Maximum Timer" class="input" id="max_timer" min="0" value="{{ controller_data.controller_times.max_time }}" required/>
                         </div>
                         <div>
                             <label for="timer_per_vehicle" class="form-label">Time per Vehicle (s)</label>
-                            <input name="timer_per_vehicle" type="number" placeholder="Time per Vehicle" class="input" id="timer_per_vehicle" min="0" required/>
+                            <input name="timer_per_vehicle" type="number" placeholder="Time per Vehicle" class="input" id="timer_per_vehicle" min="0" step="0.1" value="{{ controller_data.controller_times.time_per_vehicle }}" required/>
                         </div>
                     </div>
                 </div>
@@ -67,5 +67,6 @@
 {% block scripts %}
     {{ controller_data|json_script:"controller-data" }}
     <script src="{% static 'smart_traffic_light/js/traffic_visual.js' %}"></script>
+    <script src="{% static 'smart_traffic_light/js/api.js' %}"></script>
     <script src="{% static 'smart_traffic_light/js/controller.js' %}"></script>
 {% endblock scripts %}

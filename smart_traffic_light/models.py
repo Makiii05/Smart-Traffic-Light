@@ -74,3 +74,18 @@ class Pedestrian(models.Model):
 
     def __str__(self):
         return f"{self.intersection.name} Pedestrian Setup"
+
+
+class ControllerTimes(models.Model):
+    intersection = models.OneToOneField(Intersection,on_delete=models.CASCADE,related_name="controller_times")
+    min_time = models.IntegerField(default=0)
+    max_time = models.IntegerField(default=0)
+    time_per_vehicle = models.FloatField(default=0.0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "controller_times"
+
+    def __str__(self):
+        return f"{self.intersection.name} Controller Times"
