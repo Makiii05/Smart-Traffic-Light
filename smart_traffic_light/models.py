@@ -89,3 +89,23 @@ class ControllerTimes(models.Model):
 
     def __str__(self):
         return f"{self.intersection.name} Controller Times"
+
+
+class ControllerRoi(models.Model):
+    intersection = models.OneToOneField(Intersection, on_delete=models.CASCADE, related_name="controller_roi")
+    north_roi = models.JSONField(null=True, blank=True)
+    south_roi = models.JSONField(null=True, blank=True)
+    east_roi = models.JSONField(null=True, blank=True)
+    west_roi = models.JSONField(null=True, blank=True)
+    north_camera = models.CharField(max_length=255, null=True, blank=True)
+    south_camera = models.CharField(max_length=255, null=True, blank=True)
+    east_camera = models.CharField(max_length=255, null=True, blank=True)
+    west_camera = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "controller_rois"
+
+    def __str__(self):
+        return f"{self.intersection.name} Controller ROI"

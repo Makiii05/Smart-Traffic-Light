@@ -176,11 +176,11 @@
             const arrowLength = Math.min(100, availableLenX, availableLenY);
             const arrowWidth = Math.max(14, Math.min(22, roadHalf * 0.28));
 
-            const vLaneLeftX = cx - roadHalf - arrowWidth * 1.45;
-            const vLaneRightX = cx + roadHalf + arrowWidth * 0.45;
+            const vLaneLeftX = cx - roadHalf * 0.70;
+            const vLaneRightX = cx + roadHalf * 0.40;
 
-            const hLaneTopY = cy - roadHalf - arrowWidth * 1.45;
-            const hLaneBottomY = cy + roadHalf + arrowWidth * 0.45;
+            const hLaneTopY = cy - roadHalf * 0.70;
+            const hLaneBottomY = cy + roadHalf * 0.40;
 
             const vNorthY = cy - roadHalf - crosswalkOffsetY - arrowLength * 1.1;
             const vSouthY = cy + roadHalf + crosswalkOffsetY;

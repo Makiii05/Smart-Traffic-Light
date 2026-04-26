@@ -27,38 +27,103 @@
 
     <div class="flex flex-row gap-4 w-full h-full">
         <!-- form -->
-        <form action="" method="POST" class="flex flex-col gap-2 h-full" data-controller-times-api-url="{{ controller_times_api_url }}">
+        <form action="" method="POST" class="flex flex-col gap-2 h-full" data-controller-times-api-url="{{ controller_times_api_url }}" data-roi-picker-api-url="{{ roi_picker_api_url }}" data-controller-roi-api-url="{{ controller_roi_api_url }}" data-start-preview-api-url="{{ start_preview_api_url }}">
             {% csrf_token %}
             <div class="w-full h-full flex flex-col gap-4">
                 <div class="rounded shadow p-4 bg-base-100">
                     <div class="flex gap-4">
                         <div>
-                            <label for="min_timer" class="form-label">Minimum Timer (s)</label>
-                            <input name="min_timer" type="number" placeholder="Minimum Timer" class="input" id="min_timer" min="0" value="{{ controller_data.controller_times.min_time }}" required/>
+                            <label for="min_timer" class="form-label flex items-center gap-2">Minimum Timer (s) <span class="loading loading-spinner loading-xs text-primary hidden" data-timer-loading></span></label>
+                            <input name="min_timer" type="number" placeholder="Minimum Timer" class="input" id="min_timer" min="0" value="{{ controller_data.controller_times.min_time }}" data-timer-input required/>
                         </div>
                         <div>
-                            <label for="max_timer" class="form-label">Maximum Timer (s)</label>
-                            <input name="max_timer" type="number" placeholder="Maximum Timer" class="input" id="max_timer" min="0" value="{{ controller_data.controller_times.max_time }}" required/>
+                            <label for="max_timer" class="form-label flex items-center gap-2">Maximum Timer (s) <span class="loading loading-spinner loading-xs text-primary hidden" data-timer-loading></span></label>
+                            <input name="max_timer" type="number" placeholder="Maximum Timer" class="input" id="max_timer" min="0" value="{{ controller_data.controller_times.max_time }}" data-timer-input required/>
                         </div>
                         <div>
-                            <label for="timer_per_vehicle" class="form-label">Time per Vehicle (s)</label>
-                            <input name="timer_per_vehicle" type="number" placeholder="Time per Vehicle" class="input" id="timer_per_vehicle" min="0" step="0.1" value="{{ controller_data.controller_times.time_per_vehicle }}" required/>
+                            <label for="timer_per_vehicle" class="form-label flex items-center gap-2">Time per Vehicle (s) <span class="loading loading-spinner loading-xs text-primary hidden" data-timer-loading></span></label>
+                            <input name="timer_per_vehicle" type="number" placeholder="Time per Vehicle" class="input" id="timer_per_vehicle" min="0" step="0.1" value="{{ controller_data.controller_times.time_per_vehicle }}" data-timer-input required/>
                         </div>
                     </div>
                 </div>
                 <div class="rounded shadow p-4 bg-base-100 h-full flex flex-col gap-4">
+                    <div class="h-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                        <div class="rounded-lg border border-base-300 p-3 bg-base-200/40 flex flex-col gap-3" data-camera-card data-side="north">
+                            <p class="font-semibold text-sm">North Camera</p>
+                            <div class="flex items-center gap-2">
+                                <select class="cameraSelect select select-bordered select-sm w-full">
+                                    <option value="" selected>Select Camera</option>
+                                </select>
+                                <span class="loading loading-spinner loading-xs text-primary hidden" data-camera-loading></span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" data-roi-button data-roi-value="" disabled>Set ROI</button>
+                            <div class="h-full flex flex-col justify-center gap-2 rounded-md bg-base-300/70 px-2 py-2">
+                                <span class="h-full w-full rounded-full bg-red-500 ring-2 ring-red-700/30" data-light="red"></span>
+                                <span class="h-full w-full rounded-full bg-yellow-500 ring-2 ring-yellow-700/30" data-light="yellow"></span>
+                                <span class="h-full w-full rounded-full bg-green-500 ring-2 ring-green-700/30" data-light="green"></span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-lg border border-base-300 p-3 bg-base-200/40 flex flex-col gap-3" data-camera-card data-side="south">
+                            <p class="font-semibold text-sm">South Camera</p>
+                            <div class="flex items-center gap-2">
+                                <select class="cameraSelect select select-bordered select-sm w-full">
+                                    <option value="" selected>Select Camera</option>
+                                </select>
+                                <span class="loading loading-spinner loading-xs text-primary hidden" data-camera-loading></span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" data-roi-button data-roi-value="" disabled>Set ROI</button>
+                            <div class="h-full flex flex-col justify-center gap-2 rounded-md bg-base-300/70 px-2 py-2">
+                                <span class="h-full w-full rounded-full bg-red-500 ring-2 ring-red-700/30" data-light="red"></span>
+                                <span class="h-full w-full rounded-full bg-yellow-500 ring-2 ring-yellow-700/30" data-light="yellow"></span>
+                                <span class="h-full w-full rounded-full bg-green-500 ring-2 ring-green-700/30" data-light="green"></span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-lg border border-base-300 p-3 bg-base-200/40 flex flex-col gap-3" data-camera-card data-side="east">
+                            <p class="font-semibold text-sm">East Camera</p>
+                            <div class="flex items-center gap-2">
+                                <select class="cameraSelect select select-bordered select-sm w-full">
+                                    <option value="" selected>Select Camera</option>
+                                </select>
+                                <span class="loading loading-spinner loading-xs text-primary hidden" data-camera-loading></span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" data-roi-button data-roi-value="" disabled>Set ROI</button>
+                            <div class="h-full flex flex-col justify-center gap-2 rounded-md bg-base-300/70 px-2 py-2">
+                                <span class="h-full w-full rounded-full bg-red-500 ring-2 ring-red-700/30" data-light="red"></span>
+                                <span class="h-full w-full rounded-full bg-yellow-500 ring-2 ring-yellow-700/30" data-light="yellow"></span>
+                                <span class="h-full w-full rounded-full bg-green-500 ring-2 ring-green-700/30" data-light="green"></span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-lg border border-base-300 p-3 bg-base-200/40 flex flex-col gap-3" data-camera-card data-side="west">
+                            <p class="font-semibold text-sm">West Camera</p>
+                            <div class="flex items-center gap-2">
+                                <select class="cameraSelect select select-bordered select-sm w-full">
+                                    <option value="" selected>Select Camera</option>
+                                </select>
+                                <span class="loading loading-spinner loading-xs text-primary hidden" data-camera-loading></span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" data-roi-button data-roi-value="" disabled>Set ROI</button>
+                            <div class="h-full flex flex-col justify-center gap-2 rounded-md bg-base-300/70 px-2 py-2">
+                                <span class="h-full w-full rounded-full bg-red-500 ring-2 ring-red-700/30" data-light="red"></span>
+                                <span class="h-full w-full rounded-full bg-yellow-500 ring-2 ring-yellow-700/30" data-light="yellow"></span>
+                                <span class="h-full w-full rounded-full bg-green-500 ring-2 ring-green-700/30" data-light="green"></span>
+                            </div>
+                        </div>
+                    </div>
                     <!-- select camera -->
                     <!-- set ROI -->
                     <!-- traffic lights visual -->
                     <div class="flex gap-2 justify-end mt-auto">
                         <a href="{% url 'index' %}" type="button" class="btn">Cancel</a>
-                        <button type="submit" class="btn btn-success" >Start</button>
+                        <button type="button" class="btn btn-success" id="start_button" disabled>Start</button>
                     </div>
                 </div>
             </div>
         </form>
         <!-- visual -->
-        <div class="w-full rounded shadow p-4 bg-base-100 h-full">
+        <div class="w-full xl:w-1/2 rounded shadow p-4 bg-base-100 h-full min-h-[360px]">
             <canvas class="w-full h-full" id="myCanvas"></canvas>
         </div>
     </div>
